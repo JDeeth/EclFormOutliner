@@ -1,3 +1,4 @@
+import argparse
 import json
 from operator import itemgetter
 
@@ -8,6 +9,12 @@ from operator import itemgetter
 # ignores column titles for collection fields
 # does not indicate group scope
 # number input fields do not have a subType - needs special case
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('form_json', help="Eclipse form config json file")
+
+args = parser.parse_args()
 
 def identify_rule(item):
   # finds name of form rule, or GUID of global rule, applied to this item
@@ -67,19 +74,22 @@ def mandatory_type(control):
   
 
 
-# hardcoded to open test file for now
-with open("Adult Care Home Placement_3.json") as file:
-  data = json.load(file)
+# load file specified in command line
+with open(args.form_json) as file:
+  form = json.load(file)
   
-  print(data['name'])
-  print(f"Version: {data['version']}")
-  
-  rules = data['rules']
+  # print name and version
+  print(form['name'])
+  print(f"Version: {form['version']}")
+
+  # list form rules
+  rules = form['rules']
   print("\nForm rules:")
   for r in sorted(rules, key=itemgetter('name')):
     print(f"  {r['name']}")
   
-  pages = data["pages"]
+  # print outline of pages and sections
+  pages = form['pages']
   print("\nForm outline:")
   for page in pages:
     rule = identify_rule(page)
@@ -99,20 +109,20 @@ with open("Adult Care Home Placement_3.json") as file:
   print() # spacing
   print("Detailed form outline:")
   for page in pages:
-    print() # blank line for spacing
+    print() # spacing
     print(f"Page:\t{page['title']}")
     print(f"Name:\t{page['name']}")
     rule = identify_rule(page)
     if rule:
-      print(f"Visibility rule:\t{rule}")
+      print(f"Visibility:\t{rule}")
     
     for section in page['sections']:
-      print() # blank line for spacing
+      print() # spacing
       print(f"Section:\t{section['title']}")
       print(f"Name:\t{section['name']}")
       rule = identify_rule(section)
       if rule:
-        print(f"Visibility rule:\t{rule}")
+        print(f"Visibility:\t{rule}")
            
       for control in collapse_section(section):
         print() # spacing
