@@ -7,7 +7,6 @@ from operator import itemgetter
 # bugs:
 # puts collection fields after normal fields in each section (ignores row number)
 # ignores column titles for collection fields
-# does not indicate group scope
 # number input fields do not have a subType - needs special case
 
 parser = argparse.ArgumentParser()
@@ -134,9 +133,15 @@ with open(args.form_json) as file:
           print("Choices:")
           for choice in parse_choices(control):
             print(f"\t\t{choice}")
+        group_scope = control.get('groupScope', False)
+        if group_scope:
+          print(f"Group scope:\tTrue")
         mandatory = mandatory_type(control)
         if mandatory:
           print(f"Mandatory:\t{mandatory}")
         rule = identify_rule(control)
         if rule:
           print(f"Visibility:\t{rule}")
+
+  print()
+  print("Form outliner v0.3")
